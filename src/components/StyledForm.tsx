@@ -17,7 +17,7 @@ export const CheckoutContainer = styled.div`
   transform: translateX(-50%);
 `
 
-export const BodyTextContainer = styled.div`
+export const BodyTextContainer = styled.div<{ showFullContent?: boolean }>`
   color: white;
   font-family: "DM Serif Display", serif;
   font-size: 80px;

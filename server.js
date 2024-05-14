@@ -2,17 +2,36 @@
 const stripe = require('stripe')('sk_test_51LoGViKv008lOcIW4XZiHnwZolOGAAPa83KIPWMFOU6co5SuVFkkxfbda4XBpFfDA3tPS8nS4pcn4vvx4g0RB2wA00VT66YQyY');
 const express = require('express');
 const app = express();
+
+app.use(express.json());
 app.use(express.static('public'));
 
 const YOUR_DOMAIN = 'http://localhost:3000';
 
+const PRICE_TO_ID_MAPPING = {
+  5: "price_1PGEBMKv008lOcIWiqWzKa7E",
+  10: "price_1PGEBUKv008lOcIWFjvbbHll",
+  25: "price_1PGEBhKv008lOcIWgzvJOs48",
+  100: "price_1PFXazKv008lOcIWMr9C6nWd",
+  500: "price_1PGEBsKv008lOcIWiHnQXMG0"
+}
+
 app.post('/create-checkout-session', async (req, res) => {
+  body = req.body;
+  if (!body) {
+    return res.status(400).send({ error: "No request body provided." });
+  }
+  amount = req.body.amount;
+
+  if (!amount) {
+    return res.status(400).send({ error: "No amount provided in request." });
+  }
   const session = await stripe.checkout.sessions.create({
     ui_mode: 'embedded',
     line_items: [
       {
         // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-        price: 'price_1PFXazKv008lOcIWMr9C6nWd',
+        price: PRICE_TO_ID_MAPPING[amount],
         quantity: 1,
       },
     ],

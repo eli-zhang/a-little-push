@@ -22,6 +22,7 @@ const CheckoutForm = () => {
   const [goal, setGoal] = useState('');
   const [amount, setAmount] = useState(5);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [showFullContent, setShowFullContent] = useState(false);
 
   const fetchClientSecret = useCallback(() => {
     return fetch("/create-checkout-session", {
@@ -47,7 +48,14 @@ const CheckoutForm = () => {
     setAmount(selectedAmount);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      setShowFullContent(true);
+    }
+  };
+
   const amounts = [5, 10, 25, 100, 500];
+  
   if (showCheckout) {
     return (
       <ContentContainer>
@@ -65,8 +73,8 @@ const CheckoutForm = () => {
   }
 
   return (
-    <div>
-      <BodyTextContainer>
+    <div onKeyDown={handleKeyDown} tabIndex={0}>
+      <BodyTextContainer showFullContent={showFullContent}>
         <PromptContainer>
           <BodyText>
             Let's start with a goal:
@@ -78,23 +86,27 @@ const CheckoutForm = () => {
             onChange={(e) => setGoal(e.target.value)}
           />
         </PromptContainer>
-        <WagerContainer>
-          <BodyText>
-            And how much are you willing to wager?
-          </BodyText>
-          <div>
-            {amounts.map((amountValue) => (
-              <WagerPill 
-              key={amountValue} 
-              onClick={() => handleAmountSelect(amountValue)} 
-              isActive={amount === amountValue}>
-                ${amountValue}
-              </WagerPill>
-            ))}
-          </div>
-        </WagerContainer>
-        
-        <ProceedButton onClick={handleAccept}>Proceed</ProceedButton>
+        {showFullContent && (
+          <>
+            <WagerContainer>
+              <BodyText>
+                And how much are you willing to wager?
+              </BodyText>
+              <div>
+                {amounts.map((amountValue) => (
+                  <WagerPill 
+                  key={amountValue} 
+                  onClick={() => handleAmountSelect(amountValue)} 
+                  isActive={amount === amountValue}>
+                    ${amountValue}
+                  </WagerPill>
+                ))}
+              </div>
+            </WagerContainer>
+            
+            <ProceedButton onClick={handleAccept}>Proceed</ProceedButton>
+          </>
+        )}
       </BodyTextContainer>
       
     </div>
