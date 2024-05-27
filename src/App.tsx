@@ -11,36 +11,66 @@ import {
   Navigate
 } from "react-router-dom";
 import { ContentContainer, CheckoutContainer, BodyTextContainer, 
-  BodyText, GoalInput, PromptContainer, WagerContainer, WagerPill, ProceedButton } from './components/StyledForm'
+  FirstInstructionText, BodyText, GoalInput, PromptContainer, WagerContainer, WagerPill, 
+  ProceedButton, RemainingContentContainer, ContactInputContainer, ContactInput, ContactOption 
+} from './components/StyledForm'
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
 // This is your test public API key.
 const stripePromise = loadStripe("pk_test_51LoGViKv008lOcIWwZ9EwabpQbjh8gfLoncVeufR7fVtxYhFjTerQ3ZjY0kstPTri0hjiVJ7ncjx2w3uhRayZDPg00pPKf9lzT");
+const BACKEND_URL = "https://hqw51l1t2i.execute-api.us-east-1.amazonaws.com"
 
 const CheckoutForm = () => {
   const [goal, setGoal] = useState('');
   const [amount, setAmount] = useState(5);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
+  const [showContact, setShowContact] = useState(false);
+  const [contact, setContact] = useState('');
+  const [contactType, setContactType] = useState('email');
+  const [options, setOptions] = useState<{ clientSecret: string | null}>({ clientSecret: null}); 
 
-  const fetchClientSecret = useCallback(() => {
-    return fetch("/create-checkout-session", {
+  const fetchClientSecret = useCallback((accountId: string) => {
+    return fetch(`${BACKEND_URL}/create-checkout-session`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ amount })
+      body: JSON.stringify({ amount, account_id: accountId })
     })
     .then((res) => res.json())
     .then((data) => data.clientSecret);
   }, [amount]);
 
-  const options = {fetchClientSecret};
-
-  const handleAccept = () => {
+  const handleProceed = () => {
     if (amount && goal) {
-      setShowCheckout(true);
+      setShowContact(true);
+    }
+  };
+
+  const handleFinish = () => {
+    if (contact && contactType) {
+      const payload = contactType === 'phone' ? { phone_number: contact } : { email: contact };
+  
+      fetch(`${BACKEND_URL}/create-account`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data);
+        setShowCheckout(true);
+        fetchClientSecret(data.account_id).then(clientSecret => {
+          setOptions({ clientSecret }); // Set options after fetching clientSecret
+        });;
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
     }
   };
 
@@ -76,9 +106,9 @@ const CheckoutForm = () => {
     <div onKeyDown={handleKeyDown} tabIndex={0}>
       <BodyTextContainer showFullContent={showFullContent}>
         <PromptContainer>
-          <BodyText>
+          <FirstInstructionText shouldDisplay={!showFullContent}>
             Let's start with a goal:
-          </BodyText>
+          </FirstInstructionText>
           <GoalInput
             type="text"
             placeholder="Enter your goal"
@@ -86,29 +116,54 @@ const CheckoutForm = () => {
             onChange={(e) => setGoal(e.target.value)}
           />
         </PromptContainer>
-        {showFullContent && (
-          <>
-            <WagerContainer>
-              <BodyText>
-                And how much are you willing to wager?
-              </BodyText>
-              <div>
-                {amounts.map((amountValue) => (
-                  <WagerPill 
-                  key={amountValue} 
-                  onClick={() => handleAmountSelect(amountValue)} 
-                  isActive={amount === amountValue}>
-                    ${amountValue}
-                  </WagerPill>
-                ))}
-              </div>
-            </WagerContainer>
+        <RemainingContentContainer shouldDisplay={showFullContent && !showContact}>
+          <WagerContainer>
+            <BodyText shouldDisplay={true}>
+              And how much can you commit to it?
+            </BodyText>
+            <div>
+              {amounts.map((amountValue) => (
+                <WagerPill 
+                key={amountValue} 
+                onClick={() => handleAmountSelect(amountValue)} 
+                isActive={amount === amountValue}>
+                  ${amountValue}
+                </WagerPill>
+              ))}
+            </div>
+          </WagerContainer>
+          <ProceedButton onClick={handleProceed}>Continue</ProceedButton>
+        </RemainingContentContainer>
+        <RemainingContentContainer shouldDisplay={showContact}>
+        <ContactInputContainer>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <BodyText shouldDisplay={true}>
+              How can we remember you?
+            </BodyText>
+            <div style={{ marginLeft: 20, marginBottom: 5 }}>
+              <ContactOption 
+                onClick={() => setContactType('email')} 
+                isActive={contactType === 'email'}>
+                email
+              </ContactOption>
+              <ContactOption 
+                onClick={() => setContactType('phone')} 
+                isActive={contactType === 'phone'}>
+                phone
+              </ContactOption>
+            </div>
+            </div>
+            <ContactInput
+              type={contactType === 'email' ? 'email' : 'tel'}
+              placeholder={contactType === 'email' ? 'great_success@gmail.com' : '123-456-7890'}
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+            />
             
-            <ProceedButton onClick={handleAccept}>Proceed</ProceedButton>
-          </>
-        )}
+          </ContactInputContainer>
+          <ProceedButton onClick={handleFinish}>Confirm</ProceedButton>
+        </RemainingContentContainer>
       </BodyTextContainer>
-      
     </div>
   );
 }
@@ -122,7 +177,7 @@ const Return = () => {
     const urlParams = new URLSearchParams(queryString);
     const sessionId = urlParams.get('session_id');
 
-    fetch(`/session-status?session_id=${sessionId}`)
+    fetch(`${BACKEND_URL}/session-status?session_id=${sessionId}`)
       .then((res) => res.json())
       .then((data) => {
         setStatus(data.status);
