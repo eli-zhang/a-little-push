@@ -10,9 +10,10 @@ import {
   Routes,
   Navigate
 } from "react-router-dom";
+import OverviewPage from './pages/OverviewPage'
 import { ContentContainer, CheckoutContainer, BodyTextContainer, 
   FirstInstructionText, BodyText, GoalInput, PromptContainer, WagerContainer, WagerPill, 
-  ProceedButton, RemainingContentContainer, ContactInputContainer, ContactInput, ContactOption 
+  ProceedButton, Spinner, RemainingContentContainer, ContactInputContainer, ContactInput, ContactOption 
 } from './components/StyledForm'
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
@@ -30,16 +31,20 @@ const CheckoutForm = () => {
   const [contact, setContact] = useState('');
   const [contactType, setContactType] = useState('email');
   const [options, setOptions] = useState<{ clientSecret: string | null}>({ clientSecret: null}); 
+  const [isLoading, setIsLoading] = useState(false); 
 
-  const fetchClientSecret = useCallback((accountId: string) => {
+  const fetchClientSecret = useCallback((accountId: string, commitmentId: string) => {
     return fetch(`${BACKEND_URL}/create-checkout-session`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ amount, account_id: accountId })
+      body: JSON.stringify({ amount, account_id: accountId, commitment_id: commitmentId })
     })
-    .then((res) => res.json())
+    .then((res) => {
+      setShowCheckout(true);
+      return res.json()
+    })
     .then((data) => data.clientSecret);
   }, [amount]);
 
@@ -49,27 +54,48 @@ const CheckoutForm = () => {
     }
   };
 
+  const createAccount = async (payload: { phone_number: string } | { email: string }) => {
+    return fetch(`${BACKEND_URL}/create-account`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    })
+  }
+
+  const createCommitment = async (payload: { account_id: string, description: string, amount: number }) => {
+    return fetch(`${BACKEND_URL}/create-commitment`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    })
+  }
+
   const handleFinish = () => {
     if (contact && contactType) {
+      setIsLoading(true);
       const payload = contactType === 'phone' ? { phone_number: contact } : { email: contact };
-  
-      fetch(`${BACKEND_URL}/create-account`, {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      })
-      .then(response => response.json())
+      
+      let accountId: string;
+
+      createAccount(payload).then(response => response.json())
       .then(data => {
-        console.log('Success:', data);
-        setShowCheckout(true);
-        fetchClientSecret(data.account_id).then(clientSecret => {
+        accountId = data.account_id;
+        localStorage.setItem('account_id', accountId);
+        return createCommitment({ account_id: accountId, description: goal, amount: amount})
+    }).then(response => response.json())
+      .then(data => {
+        fetchClientSecret(accountId, data.commitment_id).then(clientSecret => {
           setOptions({ clientSecret }); // Set options after fetching clientSecret
-        });;
+          setIsLoading(false);
+        });
       })
       .catch((error) => {
         console.error('Error:', error);
+        setIsLoading(false);
       });
     }
   };
@@ -80,7 +106,13 @@ const CheckoutForm = () => {
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
-      setShowFullContent(true);
+      if (!showFullContent) {
+        setShowFullContent(true);
+      } else if (!showContact) {
+        handleProceed()
+      } else {
+        handleFinish()
+      }
     }
   };
 
@@ -135,23 +167,23 @@ const CheckoutForm = () => {
           <ProceedButton onClick={handleProceed}>Continue</ProceedButton>
         </RemainingContentContainer>
         <RemainingContentContainer shouldDisplay={showContact}>
-        <ContactInputContainer>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <BodyText shouldDisplay={true}>
-              How can we remember you?
-            </BodyText>
-            <div style={{ marginLeft: 20, marginBottom: 5 }}>
-              <ContactOption 
-                onClick={() => setContactType('email')} 
-                isActive={contactType === 'email'}>
-                email
-              </ContactOption>
-              <ContactOption 
-                onClick={() => setContactType('phone')} 
-                isActive={contactType === 'phone'}>
-                phone
-              </ContactOption>
-            </div>
+          <ContactInputContainer>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <BodyText shouldDisplay={true}>
+                How can we remember you?
+              </BodyText>
+              <div style={{ marginLeft: 20, marginBottom: 5 }}>
+                <ContactOption 
+                  onClick={() => setContactType('email')} 
+                  isActive={contactType === 'email'}>
+                  email
+                </ContactOption>
+                <ContactOption 
+                  onClick={() => setContactType('phone')} 
+                  isActive={contactType === 'phone'}>
+                  phone
+                </ContactOption>
+              </div>
             </div>
             <ContactInput
               type={contactType === 'email' ? 'email' : 'tel'}
@@ -161,7 +193,9 @@ const CheckoutForm = () => {
             />
             
           </ContactInputContainer>
-          <ProceedButton onClick={handleFinish}>Confirm</ProceedButton>
+          <ProceedButton onClick={handleFinish}>
+            {isLoading ? <Spinner/> : 'Confirm'}
+          </ProceedButton>
         </RemainingContentContainer>
       </BodyTextContainer>
     </div>
@@ -211,8 +245,9 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="" element={<CheckoutForm />} />
-        <Route path="/checkout" element={<CheckoutForm />} />
+        <Route path="/start" element={<CheckoutForm />} />
         <Route path="/return" element={<Return />} />
+        <Route path="/home" element={<OverviewPage />} />
       </Routes>
     </Router>
   )

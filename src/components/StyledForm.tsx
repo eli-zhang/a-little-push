@@ -160,3 +160,45 @@ export const ContactOption = styled.button<{ isActive?: boolean }>`
     color: #163C3A;
   `}
 `;
+
+export const Spinner = styled.span`
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #ffffff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+`
+
+export const CustomCheckbox = styled.input.attrs({ type: 'checkbox' })`
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid white;
+  border-radius: 50%;
+  background-color: transparent;
+  cursor: pointer;
+  position: relative;
+  margin-right: 10px;
+
+  &:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    background-color: white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+`;
