@@ -22,16 +22,22 @@ import { ContentContainer, CheckoutContainer, BodyTextContainer,
 const stripePromise = loadStripe("pk_test_51LoGViKv008lOcIWwZ9EwabpQbjh8gfLoncVeufR7fVtxYhFjTerQ3ZjY0kstPTri0hjiVJ7ncjx2w3uhRayZDPg00pPKf9lzT");
 const BACKEND_URL = "https://hqw51l1t2i.execute-api.us-east-1.amazonaws.com"
 
+enum Stage {
+  START,
+  SET_AMOUNT,
+  CONTACT,
+  CHECKOUT
+}
+
 const CheckoutForm = () => {
   const [goal, setGoal] = useState('');
   const [amount, setAmount] = useState(5);
-  const [showCheckout, setShowCheckout] = useState(false);
-  const [showFullContent, setShowFullContent] = useState(false);
-  const [showContact, setShowContact] = useState(false);
   const [contact, setContact] = useState('');
   const [contactType, setContactType] = useState('email');
   const [options, setOptions] = useState<{ clientSecret: string | null}>({ clientSecret: null}); 
   const [isLoading, setIsLoading] = useState(false); 
+  const [accountId, setAccountId] = useState('');
+  const [stage, setStage] = useState<Stage>(Stage.START);
 
   const fetchClientSecret = useCallback((accountId: string, commitmentId: string) => {
     return fetch(`${BACKEND_URL}/create-checkout-session`, {
@@ -42,15 +48,27 @@ const CheckoutForm = () => {
       body: JSON.stringify({ amount, account_id: accountId, commitment_id: commitmentId })
     })
     .then((res) => {
-      setShowCheckout(true);
+      setStage(Stage.CHECKOUT)
       return res.json()
     })
     .then((data) => data.clientSecret);
   }, [amount]);
 
+  useEffect(() => {
+    const accountId = localStorage.getItem('account_id');
+    if (accountId) {
+      setAccountId(accountId);
+    }
+  }, []);
+
   const handleProceed = () => {
     if (amount && goal) {
-      setShowContact(true);
+      if (!accountId) {
+        setStage(Stage.CONTACT)
+      } else {
+        setIsLoading(true)
+        createCommitmentThenRedirect()
+      }
     }
   };
 
@@ -74,22 +92,12 @@ const CheckoutForm = () => {
     })
   }
 
-  const handleFinish = () => {
-    if (contact && contactType) {
-      setIsLoading(true);
-      const payload = contactType === 'phone' ? { phone_number: contact } : { email: contact };
-      
-      let accountId: string;
-
-      createAccount(payload).then(response => response.json())
-      .then(data => {
-        accountId = data.account_id;
-        localStorage.setItem('account_id', accountId);
-        return createCommitment({ account_id: accountId, description: goal, amount: amount})
-    }).then(response => response.json())
+  const createCommitmentThenRedirect = () => {
+    setIsLoading(true);
+    createCommitment({ account_id: accountId, description: goal, amount: amount}).then(response => response.json())
       .then(data => {
         fetchClientSecret(accountId, data.commitment_id).then(clientSecret => {
-          setOptions({ clientSecret }); // Set options after fetching clientSecret
+          setOptions({ clientSecret });
           setIsLoading(false);
         });
       })
@@ -97,6 +105,22 @@ const CheckoutForm = () => {
         console.error('Error:', error);
         setIsLoading(false);
       });
+  }
+
+  const handleFinish = () => {
+    if (contact && contactType) {
+      setIsLoading(true);
+      const payload = contactType === 'phone' ? { phone_number: contact } : { email: contact };
+      
+      let accountId: string;
+
+      createAccount(payload)
+      .then(response => response.json())
+      .then(data => {
+        accountId = data.account_id;
+        localStorage.setItem('account_id', accountId);
+        createCommitmentThenRedirect()
+      })
     }
   };
 
@@ -106,9 +130,9 @@ const CheckoutForm = () => {
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
-      if (!showFullContent) {
-        setShowFullContent(true);
-      } else if (!showContact) {
+      if (stage == Stage.START) {
+        setStage(Stage.SET_AMOUNT)
+      } else if (stage == Stage.SET_AMOUNT) {
         handleProceed()
       } else {
         handleFinish()
@@ -118,7 +142,7 @@ const CheckoutForm = () => {
 
   const amounts = [5, 10, 25, 100, 500];
   
-  if (showCheckout) {
+  if (stage == Stage.CHECKOUT) {
     return (
       <ContentContainer>
         <CheckoutContainer>
@@ -136,9 +160,9 @@ const CheckoutForm = () => {
 
   return (
     <div onKeyDown={handleKeyDown} tabIndex={0}>
-      <BodyTextContainer showFullContent={showFullContent}>
+      <BodyTextContainer showFullContent={stage == Stage.START}>
         <PromptContainer>
-          <FirstInstructionText shouldDisplay={!showFullContent}>
+          <FirstInstructionText shouldDisplay={stage == Stage.START}>
             Let's start with a goal:
           </FirstInstructionText>
           <GoalInput
@@ -148,7 +172,7 @@ const CheckoutForm = () => {
             onChange={(e) => setGoal(e.target.value)}
           />
         </PromptContainer>
-        <RemainingContentContainer shouldDisplay={showFullContent && !showContact}>
+        <RemainingContentContainer shouldDisplay={stage == Stage.SET_AMOUNT}>
           <WagerContainer>
             <BodyText shouldDisplay={true}>
               And how much can you commit to it?
@@ -164,9 +188,11 @@ const CheckoutForm = () => {
               ))}
             </div>
           </WagerContainer>
-          <ProceedButton onClick={handleProceed}>Continue</ProceedButton>
+          <ProceedButton onClick={handleProceed} showArrow={!isLoading}>
+            {isLoading ? <Spinner/> : 'Continue'}
+          </ProceedButton>
         </RemainingContentContainer>
-        <RemainingContentContainer shouldDisplay={showContact}>
+        <RemainingContentContainer shouldDisplay={stage == Stage.CONTACT}>
           <ContactInputContainer>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <BodyText shouldDisplay={true}>
@@ -193,7 +219,7 @@ const CheckoutForm = () => {
             />
             
           </ContactInputContainer>
-          <ProceedButton onClick={handleFinish}>
+          <ProceedButton onClick={handleFinish} showArrow={!isLoading}>
             {isLoading ? <Spinner/> : 'Confirm'}
           </ProceedButton>
         </RemainingContentContainer>
@@ -221,7 +247,7 @@ const Return = () => {
 
   if (status === 'open') {
     return (
-      <Navigate to="/checkout" />
+      <Navigate to="/start" />
     )
   }
 

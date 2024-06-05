@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BodyTextContainer, BodyText, ProceedButton, PromptContainer, FirstInstructionText, CustomCheckbox, WagerContainer } from '../components/StyledForm';
+import { BodyTextContainer, WagerPill, WagerPillWithAccept, ProceedButton, PromptContainer, FirstInstructionText, CustomCheckbox, WagerContainer, ListLabel } from '../components/StyledForm';
 
 const BACKEND_URL = "https://hqw51l1t2i.execute-api.us-east-1.amazonaws.com";
 
 const OverviewPage = () => {
-  const [commitments, setCommitments] = useState<{ description: string, amount: number }[]>([]);
+  const [commitments, setCommitments] = useState<{ commitment_id: string, description: string, amount: number, completed: boolean }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const accountId = localStorage.getItem('account_id'); 
@@ -46,10 +46,11 @@ const OverviewPage = () => {
           commitments && (<ul style={{ listStyleType: 'none', padding: 0 }}>
           {commitments.map((commitment, index) => (
             <li key={index} style={{ display: 'flex', alignItems: 'center' }}>
-              <CustomCheckbox id={`commitment-${index}`} />
-              <label htmlFor={`commitment-${index}`} style={{ color: 'white' }}>
-                {commitment.description} - ${commitment.amount}
-              </label>
+              <CustomCheckbox id={`commitment-${index}`} checked={commitment.completed} />
+              <ListLabel htmlFor={`commitment-${index}`} completed={commitment.completed}>
+                {commitment.description}
+              </ListLabel>
+              <WagerPillWithAccept>${commitment.amount}</WagerPillWithAccept>
             </li>
           ))}
         </ul>)
@@ -57,8 +58,8 @@ const OverviewPage = () => {
       </ WagerContainer>
         
       
-      <ProceedButton onClick={() => window.location.href = '/'}>
-        Back to Home
+      <ProceedButton onClick={() => window.location.href = '/'} showArrow={true}>
+        Pick something new
       </ProceedButton>
     </BodyTextContainer>
   );

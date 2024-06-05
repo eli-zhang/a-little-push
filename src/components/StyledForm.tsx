@@ -91,7 +91,7 @@ export const WagerPill = styled.button<{ isActive?: boolean }>`
   `}
 `;
 
-export const ProceedButton = styled.button`
+export const ProceedButton = styled.button<{ showArrow?: boolean }>`
   padding: 10px 20px;
   background-color: transparent; 
   color: white;
@@ -111,10 +111,12 @@ export const ProceedButton = styled.button`
     color: #163C3A;
   }
 
-  &:after { 
-    content: '→'; 
-    margin-left: 10px; 
-  }
+  ${props => props.showArrow && css`
+    &:after { 
+      content: '→'; 
+      margin-left: 10px; 
+    }
+  `}
 `;
 
 export const ContactInputContainer = styled.div`
@@ -201,4 +203,37 @@ export const CustomCheckbox = styled.input.attrs({ type: 'checkbox' })`
     border-radius: 50%;
     transform: translate(-50%, -50%);
   }
+`;
+
+export const ListLabel = styled.label<{ completed?: boolean }>`
+  color: ${props => props.completed ? '#cccccc' : '#eeeeee'};
+  font-size: 30px;
+  font-weight: 200px;
+  font-family: "DM Serif Display", serif;
+  padding-right: 8px;
+  padding-bottom: 3px;
+  padding-left: 8px;
+`;
+
+export const WagerPillWithAccept = styled.button<{ isActive?: boolean }>`
+  padding: 10px 15px;
+  margin: 0 5px;
+  background-color: #006b55;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;;
+  font-size: 20px;
+  font-family: "DM Serif Display", serif;
+
+  &:hover {
+    background-color: #ffffff;
+    color: #163C3A;
+  }
+
+  ${props => props.isActive && css`
+    background-color: #ffffff;
+    color: #163C3A
+  `}
 `;
