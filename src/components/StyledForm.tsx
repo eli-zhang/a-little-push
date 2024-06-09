@@ -206,13 +206,15 @@ export const CustomCheckbox = styled.input.attrs({ type: 'checkbox' })`
 `;
 
 export const ListLabel = styled.label<{ completed?: boolean }>`
-  color: ${props => props.completed ? '#cccccc' : '#eeeeee'};
+  color: ${props => props.completed ? '#aaaaaa' : '#eeeeee'};
   font-size: 30px;
-  font-weight: 200px;
+  font-weight: 200;
   font-family: "DM Serif Display", serif;
   padding-right: 8px;
   padding-bottom: 3px;
   padding-left: 8px;
+  text-decoration: ${props => props.completed ? 'line-through' : 'none'};
+  text-decoration-thickness: 2px; 
 `;
 
 export const WagerPillWithAccept = styled.button<{ isActive?: boolean }>`

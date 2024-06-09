@@ -37,6 +37,7 @@ const CheckoutForm = () => {
   const [options, setOptions] = useState<{ clientSecret: string | null}>({ clientSecret: null}); 
   const [isLoading, setIsLoading] = useState(false); 
   const [accountId, setAccountId] = useState('');
+  const [commitmentFinalized, setCommitmentFinalized] = useState(false);
   const [stage, setStage] = useState<Stage>(Stage.START);
 
   const fetchClientSecret = useCallback((accountId: string, commitmentId: string) => {
@@ -61,13 +62,26 @@ const CheckoutForm = () => {
     }
   }, []);
 
+
+  useEffect(() => {
+    if (accountId) {
+      localStorage.setItem('account_id', accountId);
+    }
+  }, [accountId]);
+
+  useEffect(() => {
+    if (commitmentFinalized) {
+      createCommitmentThenRedirect()
+    }
+  }, [commitmentFinalized]);
+
   const handleProceed = () => {
     if (amount && goal) {
       if (!accountId) {
         setStage(Stage.CONTACT)
       } else {
         setIsLoading(true)
-        createCommitmentThenRedirect()
+        setCommitmentFinalized(true)
       }
     }
   };
@@ -111,15 +125,12 @@ const CheckoutForm = () => {
     if (contact && contactType) {
       setIsLoading(true);
       const payload = contactType === 'phone' ? { phone_number: contact } : { email: contact };
-      
-      let accountId: string;
 
       createAccount(payload)
       .then(response => response.json())
       .then(data => {
-        accountId = data.account_id;
-        localStorage.setItem('account_id', accountId);
-        createCommitmentThenRedirect()
+        setAccountId(data.account_id);
+        setCommitmentFinalized(true)
       })
     }
   };
@@ -230,7 +241,6 @@ const CheckoutForm = () => {
 
 const Return = () => {
   const [status, setStatus] = useState(null);
-  const [customerEmail, setCustomerEmail] = useState('');
 
   useEffect(() => {
     const queryString = window.location.search;
@@ -241,7 +251,6 @@ const Return = () => {
       .then((res) => res.json())
       .then((data) => {
         setStatus(data.status);
-        setCustomerEmail(data.customer_email);
       });
   }, []);
 
@@ -253,13 +262,7 @@ const Return = () => {
 
   if (status === 'complete') {
     return (
-      <section id="success">
-        <p>
-          We appreciate your business! A confirmation email will be sent to {customerEmail}.
-
-          If you have any questions, please email <a href="mailto:orders@example.com">orders@example.com</a>.
-        </p>
-      </section>
+      <Navigate to="/home" />
     )
   }
 

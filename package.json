@@ -25,7 +25,7 @@
   "devDependencies": {
     "concurrently": "4.1.2"
   },
-  "homepage": "http://localhost:3000/checkout",
+  "homepage": "http://localhost:3000/home",
   "proxy": "http://localhost:4242",
   "scripts": {
     "start-client": "react-scripts start",
