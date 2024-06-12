@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BodyTextContainer, Spinner, WagerPillWithAccept, StatusPill, ProceedButton, PromptContainer, FirstInstructionText, CustomCheckbox, WagerContainer, ListLabel } from '../components/StyledForm';
+import { BodyTextContainer, Spinner, WagerPillWithAccept, StatusPill, ProceedButton, FirstInstructionText, CustomCheckbox, WagerContainer, ListLabel } from '../components/StyledForm';
+import { BACKEND_URL } from "../constants";
 
-const BACKEND_URL = "https://hqw51l1t2i.execute-api.us-east-1.amazonaws.com";
-
-const OverviewPage = () => {
+export const OverviewPage = () => {
   const [commitments, setCommitments] = useState<{ commitment_id: string, description: string, amount: number, completed: boolean, payment_status: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
@@ -28,7 +27,7 @@ const OverviewPage = () => {
       console.error('No account_id found in localStorage');
       navigate('/start'); 
     }
-  }, [accountId]);
+  }, [accountId, navigate]);
 
   const handleCheckboxChange = (index: number) => {
     setSelectedCommitments(prev => {
