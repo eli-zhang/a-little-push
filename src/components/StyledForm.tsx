@@ -219,7 +219,7 @@ export const ListLabel = styled.label<{ completed?: boolean }>`
 
 export const WagerPillWithAccept = styled.button<{ isActive?: boolean }>`
   padding: 10px 15px;
-  margin: 0 5px;
+  margin: 3px 5px;
   background-color: #006b55;
   color: white;
   border: none;
@@ -237,5 +237,37 @@ export const WagerPillWithAccept = styled.button<{ isActive?: boolean }>`
   ${props => props.isActive && css`
     background-color: #ffffff;
     color: #163C3A
+  `}
+`;
+
+export const StatusPill = styled.button<{ status?: string }>`
+  padding: 10px 15px;
+  margin: 3px 5px;
+  background-color: #006b55;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;;
+  font-size: 20px;
+  font-family: "DM Serif Display", serif;
+
+  &:hover {
+    background-color: #ffffff;
+    color: #163C3A;
+  }
+
+  ${props => props.status == `SUCCEEDED` && css`
+    background-color: #ffffff;
+    color: #163C3A;
+    display: none;
+  `}
+  ${props => props.status == `REFUNDED` && css`
+    background-color: #222222;
+    color: #888888;
+  `}
+  ${props => props.status == `PENDING` && css`
+    background-color: #cccccc;
+    color: #777777;
   `}
 `;

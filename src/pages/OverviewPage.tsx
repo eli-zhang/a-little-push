@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BodyTextContainer, WagerPill, WagerPillWithAccept, ProceedButton, PromptContainer, FirstInstructionText, CustomCheckbox, WagerContainer, ListLabel } from '../components/StyledForm';
+import { BodyTextContainer, Spinner, WagerPillWithAccept, StatusPill, ProceedButton, PromptContainer, FirstInstructionText, CustomCheckbox, WagerContainer, ListLabel } from '../components/StyledForm';
 
 const BACKEND_URL = "https://hqw51l1t2i.execute-api.us-east-1.amazonaws.com";
 
 const OverviewPage = () => {
-  const [commitments, setCommitments] = useState<{ commitment_id: string, description: string, amount: number, completed: boolean }[]>([]);
+  const [commitments, setCommitments] = useState<{ commitment_id: string, description: string, amount: number, completed: boolean, payment_status: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [selectedCommitments, setSelectedCommitments] = useState<Set<number>>(new Set());
   const navigate = useNavigate();
   const accountId = localStorage.getItem('account_id'); 
@@ -42,9 +43,9 @@ const OverviewPage = () => {
   };
 
   const markAsDone = () => {
+    setIsLoadingUpdate(true);
     const updatedCommitments = commitments.map((commitment, index) => {
       if (selectedCommitments.has(index)) {
-        console.log("commitment", commitment)
         fetch(`${BACKEND_URL}/update-commitment`, {
           method: 'POST',
           headers: {
@@ -54,6 +55,7 @@ const OverviewPage = () => {
         })
         .then((res) => res.json())
         .then((data) => {
+          setIsLoadingUpdate(false);
           console.log('Commitment updated:', data);
         })
         .catch((error) => {
@@ -88,6 +90,7 @@ const OverviewPage = () => {
                 {commitment.description}
               </ListLabel>
               <WagerPillWithAccept>${commitment.amount}</WagerPillWithAccept>
+              {commitment.payment_status && <StatusPill status={commitment.payment_status}>{commitment.payment_status}</StatusPill>}
             </li>
           ))}
         </ul>)
@@ -101,7 +104,7 @@ const OverviewPage = () => {
         </ProceedButton>
         {selectedCommitments.size > 0 && (
           <ProceedButton onClick={markAsDone} style={{ marginLeft: '10px' }}>
-            Mark as done
+            {isLoadingUpdate ? <Spinner/> : 'Mark as done'}
           </ProceedButton>
         )}
       </div>
