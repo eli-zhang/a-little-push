@@ -7,7 +7,7 @@ import {
 import { ContentContainer, CheckoutContainer, BodyTextContainer, 
   FirstInstructionText, BodyText, GoalInput, PromptContainer, WagerContainer, WagerPill, 
   ProceedButton, Spinner, RemainingContentContainer, ContactInputContainer, ContactInput, ContactOption 
-} from '../components/StyledForm'
+} from '../style/StyledForm'
 import { BACKEND_URL, PUBLIC_API_KEY } from '../constants'
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid

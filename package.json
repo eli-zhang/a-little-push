@@ -23,11 +23,13 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "concurrently": "4.1.2"
+    "concurrently": "4.1.2",
+    "gh-pages": "^6.1.1"
   },
-  "homepage": "http://localhost:3000/home",
-  "proxy": "http://localhost:4242",
+  "homepage": "https://eli-zhang.github.io/a-little-push",
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

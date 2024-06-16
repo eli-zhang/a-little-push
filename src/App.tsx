@@ -1,21 +1,21 @@
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Route,
   Routes,
 } from "react-router-dom";
 
 import { GoalCreationForm } from "./pages/GoalCreationForm";
 import { OverviewPage } from "./pages/OverviewPage";
-import { ReturnPage } from "./pages/ReturnPage";
 
 const App = () => {
     return (
-      <Router>
+      <Router basename="">
         <Routes>
-          <Route path="" element={<GoalCreationForm />} />
           <Route path="/start" element={<GoalCreationForm />} />
-          <Route path="/return" element={<ReturnPage />} />
+          <Route path="/return" element={<OverviewPage />} />
           <Route path="/home" element={<OverviewPage />} />
+          {/* <Route path="/" element={<GoalCreationForm />} /> */}
+          <Route path="*" element={<OverviewPage />} />
         </Routes>
       </Router>
     )

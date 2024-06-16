@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BodyTextContainer, Spinner, WagerPillWithAccept, StatusPill, ProceedButton, FirstInstructionText, CustomCheckbox, WagerContainer, ListLabel } from '../components/StyledForm';
+import { BodyTextContainer, Spinner, WagerPillWithAccept, StatusPill, ProceedButton, FirstInstructionText, CustomCheckbox, WagerContainer, ListLabel } from '../style/StyledForm';
 import { BACKEND_URL } from "../constants";
 
 export const OverviewPage = () => {
@@ -98,7 +98,7 @@ export const OverviewPage = () => {
         
       
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <ProceedButton onClick={() => window.location.href = '/'} showArrow={true}>
+        <ProceedButton onClick={() => navigate('/start', { replace: true })} showArrow={true}>
           Pick something new
         </ProceedButton>
         {selectedCommitments.size > 0 && (

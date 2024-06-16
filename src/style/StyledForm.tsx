@@ -257,16 +257,16 @@ export const StatusPill = styled.button<{ status?: string }>`
     color: #163C3A;
   }
 
-  ${props => props.status == `SUCCEEDED` && css`
+  ${props => props.status === `SUCCEEDED` && css`
     background-color: #ffffff;
     color: #163C3A;
     display: none;
   `}
-  ${props => props.status == `REFUNDED` && css`
+  ${props => props.status === `REFUNDED` && css`
     background-color: #222222;
     color: #888888;
   `}
-  ${props => props.status == `PENDING` && css`
+  ${props => props.status === `PENDING` && css`
     background-color: #cccccc;
     color: #777777;
   `}
