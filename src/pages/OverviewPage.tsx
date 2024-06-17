@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BodyTextContainer, Spinner, WagerPillWithAccept, StatusPill, ProceedButton, FirstInstructionText, CustomCheckbox, WagerContainer, ListLabel } from '../style/StyledForm';
-import { BACKEND_URL } from "../constants";
+import { getConfig } from '../constants';
+const { BACKEND_URL } = getConfig();
 
 export const OverviewPage = () => {
   const [commitments, setCommitments] = useState<{ commitment_id: string, description: string, amount: number, completed: boolean, payment_status: string }[]>([]);

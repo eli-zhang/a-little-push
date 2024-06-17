@@ -8,7 +8,8 @@ import { ContentContainer, CheckoutContainer, BodyTextContainer,
   FirstInstructionText, BodyText, GoalInput, PromptContainer, WagerContainer, WagerPill, 
   ProceedButton, Spinner, RemainingContentContainer, ContactInputContainer, ContactInput, ContactOption 
 } from '../style/StyledForm'
-import { BACKEND_URL, PUBLIC_API_KEY } from '../constants'
+import { getConfig } from '../constants';
+const { BACKEND_URL, PUBLIC_API_KEY } = getConfig();
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
