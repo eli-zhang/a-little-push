@@ -1,5 +1,5 @@
 import {
-  HashRouter as Router,
+  HashRouter,
   Route,
   Routes,
 } from "react-router-dom";
@@ -9,13 +9,13 @@ import { OverviewPage } from "./pages/OverviewPage";
 
 const App = () => {
     return (
-      <Router basename="/a-little-push">
+      <HashRouter>
         <Routes>
           <Route path="/start" element={<GoalCreationForm />} />
           <Route path="/home" element={<OverviewPage />} />
           <Route path="*" element={<OverviewPage />} />
         </Routes>
-      </Router>
+      </HashRouter>
     )
   }
   
