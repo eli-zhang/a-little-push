@@ -9,12 +9,10 @@ import { OverviewPage } from "./pages/OverviewPage";
 
 const App = () => {
     return (
-      <Router basename="">
+      <Router basename="/a-little-push">
         <Routes>
           <Route path="/start" element={<GoalCreationForm />} />
-          <Route path="/return" element={<OverviewPage />} />
           <Route path="/home" element={<OverviewPage />} />
-          {/* <Route path="/" element={<GoalCreationForm />} /> */}
           <Route path="*" element={<OverviewPage />} />
         </Routes>
       </Router>

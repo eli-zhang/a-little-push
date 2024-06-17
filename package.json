@@ -26,7 +26,7 @@
     "concurrently": "4.1.2",
     "gh-pages": "^6.1.1"
   },
-  "homepage": "https://eli-zhang.github.io/a-little-push",
+  "homepage": "https://eli-zhang.github.io/a-little-push/#",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
