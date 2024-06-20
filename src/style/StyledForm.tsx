@@ -266,7 +266,7 @@ export const StatusPill = styled.button<{ status?: string }>`
     background-color: #222222;
     color: #888888;
   `}
-  ${props => props.status === `PENDING` && css`
+  ${props => (props.status === `PENDING` || props.status === `UNPAID`) && css`
     background-color: #cccccc;
     color: #777777;
   `}
