@@ -164,7 +164,7 @@ export const WagerPill = styled.button<{ isActive?: boolean }>`
   `}
 `;
 
-export const ProceedButton = styled.button<{ showArrow?: boolean }>`
+export const ProceedButton = styled.button<{ showArrow?: boolean, hidden?: boolean }>`
   padding: 10px 20px;
   background-color: transparent; 
   color: white;
@@ -178,6 +178,7 @@ export const ProceedButton = styled.button<{ showArrow?: boolean }>`
   font-size: 20px;
   font-family: "DM Serif Display", serif;
   transition: background-color 0.3s, color 0.3s;
+  visibility: visible;
 
   &:hover {
     background-color: #dddddd;
@@ -189,6 +190,10 @@ export const ProceedButton = styled.button<{ showArrow?: boolean }>`
       content: '→'; 
       margin-left: 10px; 
     }
+  `}
+
+  ${props => props.hidden && css`
+    visibility: hidden;
   `}
 `;
 
@@ -362,4 +367,22 @@ export const StatusPill = styled.button<{ status?: string }>`
     background-color: #cccccc;
     color: #777777;
   `}
+`;
+
+export const DeadlinePill = styled.button<{ status?: string }>`
+  padding: 10px 15px;
+  margin: 3px 5px;
+  background-color: #ffffff;
+  color: #163C3A;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;;
+  font-size: 20px;
+  font-family: "DM Serif Display", serif;
+
+  &:hover {
+    background-color: #006b55;
+    color: white;
+  }
 `;

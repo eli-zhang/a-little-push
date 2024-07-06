@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BodyTextContainer, Spinner, WagerPillWithAccept, StatusPill, ProceedButton, FirstInstructionText, CustomCheckbox, WagerContainer, ListLabel } from '../style/StyledForm';
+import { BodyTextContainer, Spinner, WagerPillWithAccept, StatusPill, DeadlinePill, ProceedButton, FirstInstructionText, CustomCheckbox, WagerContainer, ListLabel } from '../style/StyledForm';
 import { getConfig } from '../constants';
 const { BACKEND_URL } = getConfig();
 
 export const OverviewPage = () => {
-  const [commitments, setCommitments] = useState<{ commitment_id: string, description: string, amount: number, completed: boolean, payment_status: string }[]>([]);
+  const [commitments, setCommitments] = useState<{ commitment_id: string, description: string, amount: number, completed: boolean, deadline: number, payment_status: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [selectedCommitments, setSelectedCommitments] = useState<Set<number>>(new Set());
@@ -91,6 +91,11 @@ export const OverviewPage = () => {
               </ListLabel>
               <WagerPillWithAccept>${commitment.amount}</WagerPillWithAccept>
               {commitment.payment_status && <StatusPill status={commitment.payment_status}>{commitment.payment_status}</StatusPill>}
+              {commitment.deadline && (
+                <DeadlinePill>
+                    {new Date(commitment.deadline).toLocaleDateString()}
+                </DeadlinePill>
+              )}
             </li>
           ))}
         </ul>)

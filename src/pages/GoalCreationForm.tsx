@@ -96,7 +96,7 @@ export const GoalCreationForm = () => {
     })
   }
 
-  const createCommitment = async (payload: { account_id: string, description: string, amount: number }) => {
+  const createCommitment = async (payload: { account_id: string, description: string, amount: number, deadline: number }) => {
     return fetch(`${BACKEND_URL}/create-commitment`, {
       method: "POST",
       headers: {
@@ -107,8 +107,38 @@ export const GoalCreationForm = () => {
   }
 
   const createCommitmentThenRedirect = () => {
+    if (!(durationValue || specificDate)) {
+      return;
+    }
     setIsLoading(true);
-    createCommitment({ account_id: accountId, description: goal, amount: amount}).then(response => response.json())
+
+    let deadline: number = -1;
+    if (specificDate) {
+      deadline = specificDate.getTime();
+    } else if (durationValue && durationUnit) {
+      const now = new Date();
+      switch (durationUnit) {
+        case 'minutes':
+          deadline = now.getTime() + durationValue * 60 * 1000;
+          break;
+        case 'hours':
+          deadline = now.getTime() + durationValue * 60 * 60 * 1000;
+          break;
+        case 'days':
+          deadline = now.getTime() + durationValue * 24 * 60 * 60 * 1000;
+          break;
+        case 'weeks':
+          deadline = now.getTime() + durationValue * 7 * 24 * 60 * 60 * 1000;
+          break;
+        case 'months':
+          deadline = new Date(now.setMonth(now.getMonth() + durationValue)).getTime();
+          break;
+        default:
+          break;
+      }
+    }
+
+    createCommitment({ account_id: accountId, description: goal, amount: amount, deadline: deadline}).then(response => response.json())
       .then(data => {
         fetchClientSecret(accountId, data.commitment_id).then(clientSecret => {
           setOptions({ clientSecret });
@@ -244,9 +274,9 @@ export const GoalCreationForm = () => {
                 
             </div>
           </WagerContainer>
-          <ProceedButton onClick={handleProceed} showArrow={!isLoading}>
+          {<ProceedButton onClick={handleProceed} showArrow={!isLoading} hidden={!(durationValue || specificDate)}>
             {isLoading ? <Spinner/> : 'Continue'}
-          </ProceedButton>
+          </ProceedButton>}
         </RemainingContentContainer>
         <RemainingContentContainer shouldDisplay={stage === Stage.CONTACT}>
           <ContactInputContainer>
