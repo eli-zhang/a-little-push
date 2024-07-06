@@ -1,4 +1,37 @@
-import styled, { css } from 'styled-components';
+import styled, { css, createGlobalStyle } from 'styled-components';
+import DatePicker from 'react-datepicker';
+
+export const DatePickerWrapperStyles = createGlobalStyle`
+  .date_picker {
+    background-color: #ffffff;
+    color: #163C3A;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;;
+    font-size: 20px;
+    font-family: "DM Serif Display", serif;
+    display: block;
+  }
+
+  .date_picker .react-datepicker__input-container input {
+    border: none;
+    padding: 5px; // Example style
+    font-size: 20px;
+    font-family: "DM Serif Display", serif;
+    color: #163C3A;
+    width: 10ch;
+  }
+`;
+
+export const DatePickerContainer = styled.div`
+  background-color: #ffffff;
+  border: none;
+  border-radius: 20px;
+  display: inline-block;
+  padding: 7px 15px;
+  margin: 0 5px;
+`
 
 export const ContentContainer = styled.div`
   position: absolute;
@@ -30,10 +63,20 @@ export const BodyText = styled.p<{ shouldDisplay?: boolean }>`
   opacity: ${props => props.shouldDisplay ? '1' : '0'};
 `
 
+export const OrText = styled.p<{ shouldDisplay?: boolean }>`
+  color: white;
+  margin: 0 30px;
+  transition: opacity 0.3s ease-in-out;
+  opacity: ${props => props.shouldDisplay ? '1' : '0'};
+  display: inline-block;
+  font-size: 25px;
+`
+
 export const FirstInstructionText = styled.p<{ shouldDisplay?: boolean }>`
   color: white;
   margin: 0;
   transition: opacity 0.3s ease-in-out;
+  font-size: 60px;
   opacity: ${props => props.shouldDisplay ? '1' : '0'};
 `
 
@@ -49,6 +92,24 @@ export const GoalInput = styled.input`
   font-family: "DM Serif Display", serif;
 `;
 
+export const NumberDateInput = styled.input`
+  background: transparent;
+  border: none;
+  color: #cccccc;
+  &:focus {
+    outline: none;
+  }
+  font-size: 30px;
+  font-family: "DM Serif Display", serif;
+  overflow: hidden;
+  width: 3ch;
+
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+`;
+
 export const PromptContainer = styled.div`
   margin-top: 30px;
   margin-bottom: 30px;
@@ -61,6 +122,11 @@ export const RemainingContentContainer = styled.div<{ shouldDisplay?: boolean }>
   display: ${props => props.shouldDisplay ? 'block' : 'none'};
   transition: opacity 0.3s ease-in-out;
   opacity: ${props => props.shouldDisplay ? '1' : '0'};
+
+  & > * {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
 `
 
 export const WagerContainer = styled.div`
@@ -238,6 +304,20 @@ export const WagerPillWithAccept = styled.button<{ isActive?: boolean }>`
     background-color: #ffffff;
     color: #163C3A
   `}
+`;
+
+export const DurationSelect = styled.select`
+  padding: 10px 15px;
+  margin: 0 5px;
+  background-color: #ffffff;
+  color: #163C3A;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 20px;
+  font-family: "DM Serif Display", serif;
+  transition: background-color 0.3s, color 0.3s;
+  display: inline-block;
 `;
 
 export const StatusPill = styled.button<{ status?: string }>`

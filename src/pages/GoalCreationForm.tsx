@@ -4,10 +4,13 @@ import {
   EmbeddedCheckoutProvider,
   EmbeddedCheckout
 } from '@stripe/react-stripe-js';
-import { ContentContainer, CheckoutContainer, BodyTextContainer, 
-  FirstInstructionText, BodyText, GoalInput, PromptContainer, WagerContainer, WagerPill, 
-  ProceedButton, Spinner, RemainingContentContainer, ContactInputContainer, ContactInput, ContactOption 
+import { ContentContainer, CheckoutContainer, BodyTextContainer, DatePickerContainer, 
+  FirstInstructionText, BodyText, GoalInput, PromptContainer, WagerContainer, WagerPill, OrText, DatePickerWrapperStyles,
+  ProceedButton, Spinner, RemainingContentContainer, ContactInputContainer, ContactInput, ContactOption, NumberDateInput, DurationSelect
 } from '../style/StyledForm'
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
 import { getConfig } from '../constants';
 const { BACKEND_URL, PUBLIC_API_KEY } = getConfig();
 
@@ -26,6 +29,9 @@ enum Stage {
 export const GoalCreationForm = () => {
   const [goal, setGoal] = useState('');
   const [amount, setAmount] = useState(5);
+  const [durationValue, setDurationValue] = useState<number | null>(null);
+  const [durationUnit, setDurationUnit] = useState('days');
+  const [specificDate, setSpecificDate] = useState<Date | null>(null);
   const [contact, setContact] = useState('');
   const [contactType, setContactType] = useState('email');
   const [options, setOptions] = useState<{ clientSecret: string | null}>({ clientSecret: null}); 
@@ -70,7 +76,7 @@ export const GoalCreationForm = () => {
   }, [commitmentFinalized]);
 
   const handleProceed = () => {
-    if (amount && goal) {
+    if (amount && goal && (durationValue || specificDate)) {
       if (!accountId) {
         setStage(Stage.CONTACT)
       } else {
@@ -146,6 +152,7 @@ export const GoalCreationForm = () => {
   };
 
   const amounts = [5, 10, 25, 100, 500];
+  const durationUnits = ['minutes', 'hours', 'days', 'weeks', 'months'];
   
   if (stage === Stage.CHECKOUT) {
     return (
@@ -191,6 +198,49 @@ export const GoalCreationForm = () => {
                   ${amountValue}
                 </WagerPill>
               ))}
+            </div>
+          </WagerContainer>
+          <WagerContainer>
+            <BodyText shouldDisplay={true}>
+              When will you be done by?
+            </BodyText>
+            <div>
+              <NumberDateInput
+                type="number"
+                placeholder="1"
+                value={durationValue || ''}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 3) {
+                    setDurationValue(parseInt(value));
+                  }
+                }}
+                disabled={false}
+                maxLength={3} 
+              />
+              <DurationSelect
+                value={durationUnit}
+                onChange={(e) => setDurationUnit(e.target.value)}
+              >
+                {durationUnits.map((unit) => (
+                  <option key={unit} value={unit}>
+                    {unit}
+                  </option>
+                ))}
+              </DurationSelect>
+              <OrText shouldDisplay={true}>
+              — or —
+              </OrText>
+                <DatePickerContainer>
+                  <DatePicker
+                    selected={specificDate}
+                    onChange={(date: Date | null) => setSpecificDate(date)}
+                    wrapperClassName='date_picker'
+                    placeholderText="Select date"
+                  />
+                  <DatePickerWrapperStyles />
+                </DatePickerContainer>
+                
             </div>
           </WagerContainer>
           <ProceedButton onClick={handleProceed} showArrow={!isLoading}>
