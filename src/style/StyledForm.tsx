@@ -3,7 +3,7 @@ import DatePicker from 'react-datepicker';
 
 export const DatePickerWrapperStyles = createGlobalStyle`
   .date_picker {
-    background-color: #ffffff;
+    background-color: transparent;
     color: #163C3A;
     border: none;
     border-radius: 20px;
@@ -19,18 +19,25 @@ export const DatePickerWrapperStyles = createGlobalStyle`
     padding: 5px; // Example style
     font-size: 20px;
     font-family: "DM Serif Display", serif;
+    background-color: transparent;
     color: #163C3A;
     width: 10ch;
   }
 `;
 
-export const DatePickerContainer = styled.div`
+export const DatePickerContainer = styled.div<{ isActive?: boolean}>`
   background-color: #ffffff;
   border: none;
   border-radius: 20px;
   display: inline-block;
   padding: 7px 15px;
   margin: 0 5px;
+  
+  ${props => !props.isActive && css`
+    background-color: #cccccc;
+    color: #163C3A;
+  `}
+  
 `
 
 export const ContentContainer = styled.div`
@@ -306,7 +313,7 @@ export const WagerPillWithAccept = styled.button<{ isActive?: boolean }>`
   `}
 `;
 
-export const DurationSelect = styled.select`
+export const DurationSelect = styled.select<{ isActive?: boolean}>`
   padding: 10px 15px;
   margin: 0 5px;
   background-color: #ffffff;
@@ -318,6 +325,11 @@ export const DurationSelect = styled.select`
   font-family: "DM Serif Display", serif;
   transition: background-color 0.3s, color 0.3s;
   display: inline-block;
+
+  ${props => !props.isActive && css`
+    background-color: #cccccc;
+    color: #163C3A;
+  `}
 `;
 
 export const StatusPill = styled.button<{ status?: string }>`

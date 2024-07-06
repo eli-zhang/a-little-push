@@ -31,8 +31,8 @@ export const GoalCreationForm = () => {
   const [amount, setAmount] = useState(5);
   const [durationValue, setDurationValue] = useState<number | null>(null);
   const [durationUnit, setDurationUnit] = useState('days');
-  const [specificDate, setSpecificDate] = useState<Date | null>(null);
   const [contact, setContact] = useState('');
+  const [specificDate, setSpecificDate] = useState<Date | null>(null);
   const [contactType, setContactType] = useState('email');
   const [options, setOptions] = useState<{ clientSecret: string | null}>({ clientSecret: null}); 
   const [isLoading, setIsLoading] = useState(false); 
@@ -213,14 +213,15 @@ export const GoalCreationForm = () => {
                   const value = e.target.value;
                   if (value.length <= 3) {
                     setDurationValue(parseInt(value));
+                    setSpecificDate(null);
                   }
                 }}
-                disabled={false}
                 maxLength={3} 
               />
               <DurationSelect
                 value={durationUnit}
-                onChange={(e) => setDurationUnit(e.target.value)}
+                onChange={(e) => { setDurationUnit(e.target.value); }}
+                isActive={!(specificDate !== undefined && specificDate !== null)}
               >
                 {durationUnits.map((unit) => (
                   <option key={unit} value={unit}>
@@ -231,10 +232,10 @@ export const GoalCreationForm = () => {
               <OrText shouldDisplay={true}>
               — or —
               </OrText>
-                <DatePickerContainer>
+                <DatePickerContainer isActive={!(durationValue !== undefined && durationValue !== null && !Number.isNaN(durationValue))}>
                   <DatePicker
                     selected={specificDate}
-                    onChange={(date: Date | null) => setSpecificDate(date)}
+                    onChange={(date: Date | null) => { setSpecificDate(date); setDurationValue(null); }}
                     wrapperClassName='date_picker'
                     placeholderText="Select date"
                   />
