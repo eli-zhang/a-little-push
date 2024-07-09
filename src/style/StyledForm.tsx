@@ -354,6 +354,10 @@ export const StatusPill = styled.button<{ status?: string }>`
     color: #163C3A;
   }
 
+  ${props => props.status === `DEADLINE PASSED` && css`
+    background-color: #aa3377;
+    color: #eeeeee;
+  `}
   ${props => props.status === `SUCCEEDED` && css`
     background-color: #ffffff;
     color: #163C3A;

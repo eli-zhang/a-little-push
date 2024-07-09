@@ -69,6 +69,16 @@ export const OverviewPage = () => {
     setSelectedCommitments(new Set());
   };
 
+  const getCommitmentStatus = (commitment: { commitment_id: string, description: string, amount: number, completed: boolean, deadline: number, payment_status: string }) => {
+    if (!(commitment.deadline) || commitment.payment_status === "REFUNDED") {
+      return commitment.payment_status;
+    }
+    if (new Date(commitment.deadline) < new Date()) {
+      return "DEADLINE PASSED";
+    }
+    return commitment.payment_status;
+  }
+
   return (
     <BodyTextContainer>
       <FirstInstructionText shouldDisplay={!isLoading && commitments.length > 0}>
@@ -90,7 +100,7 @@ export const OverviewPage = () => {
                 {commitment.description}
               </ListLabel>
               <WagerPillWithAccept>${commitment.amount}</WagerPillWithAccept>
-              {commitment.payment_status && <StatusPill status={commitment.payment_status}>{commitment.payment_status}</StatusPill>}
+              {commitment.payment_status && <StatusPill status={getCommitmentStatus(commitment)}>{getCommitmentStatus(commitment)}</StatusPill>}
               {commitment.deadline && (
                 <DeadlinePill>
                     {new Date(commitment.deadline).toLocaleDateString()}
