@@ -1,10 +1,12 @@
 import React, { useCallback, useState, useEffect } from "react";
 import {loadStripe} from '@stripe/stripe-js';
+import { useNavigate } from "react-router-dom";
+import { FaHome } from 'react-icons/fa';
 import {
   EmbeddedCheckoutProvider,
   EmbeddedCheckout
 } from '@stripe/react-stripe-js';
-import { ContentContainer, CheckoutContainer, BodyTextContainer, DatePickerContainer, 
+import { ContentContainer, CheckoutContainer, BodyTextContainer, DatePickerContainer, HomeButton,
   FirstInstructionText, BodyText, GoalInput, PromptContainer, WagerContainer, WagerPill, OrText, DatePickerWrapperStyles,
   ProceedButton, Spinner, RemainingContentContainer, ContactInputContainer, ContactInput, ContactOption, NumberDateInput, DurationSelect
 } from '../style/StyledForm'
@@ -40,6 +42,8 @@ export const GoalCreationForm = () => {
   const [commitmentFinalized, setCommitmentFinalized] = useState(false);
   const [stage, setStage] = useState<Stage>(Stage.START);
 
+  const navigate = useNavigate();
+
   const fetchClientSecret = useCallback((accountId: string, commitmentId: string) => {
     return fetch(`${BACKEND_URL}/create-checkout-session`, {
       method: "POST",
@@ -74,6 +78,10 @@ export const GoalCreationForm = () => {
       createCommitmentThenRedirect()
     }
   }, [commitmentFinalized]);
+
+  const navigateHome = () => {
+    navigate('/home');
+  };
 
   const handleProceed = () => {
     if (amount && goal && (durationValue || specificDate)) {
@@ -310,6 +318,11 @@ export const GoalCreationForm = () => {
           </ProceedButton>
         </RemainingContentContainer>
       </BodyTextContainer>
+      <HomeButton 
+        onClick={navigateHome} 
+      >
+        <FaHome size={30} />
+      </HomeButton>
     </div>
   );
 }

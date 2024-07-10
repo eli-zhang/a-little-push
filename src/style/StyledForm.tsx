@@ -345,7 +345,7 @@ export const StatusPill = styled.button<{ status?: string }>`
   border: none;
   border-radius: 20px;
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;;
+  transition: background-color 0.3s, color 0.3s;
   font-size: 20px;
   font-family: "DM Serif Display", serif;
 
@@ -390,3 +390,19 @@ export const DeadlinePill = styled.button<{ status?: string }>`
     color: white;
   }
 `;
+
+export const HomeButton = styled.button`
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  color: #cccccc;
+  opacity: 0.5;
+  transition: color 0.5s;
+
+  &:hover {
+    color: white;
+  }
+`
